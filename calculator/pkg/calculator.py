@@ -1,56 +1,61 @@
-def add(a, b):
-    return a + b
+# calculator.py
 
-def subtract(a, b):
-    return a - b
+class Calculator:
+    def __init__(self):
+        self.operators = {
+            "+": lambda a, b: a + b,
+            "-": lambda a, b: a - b,
+            "*": lambda a, b: a * b,
+            "/": lambda a, b: a / b,
+        }
+        self.precedence = {
+            "+": 1,
+            "-": 1,
+            "*": 2,
+            "/": 2,
+        }
 
-def multiply(a, b):
-    return a * b
+    def evaluate(self, expression):
+        if not expression or expression.isspace():
+            return None
+        tokens = expression.strip().split()
+        return self._evaluate_infix(tokens)
 
-def divide(a, b):
-    if b == 0:
-        print("Error: Cannot divide by zero.")
-        return None
-    return a / b
+    def _evaluate_infix(self, tokens):
+        values = []
+        operators = []
 
-def calculator():
-    print("Simple Calculator")
-    print("-----------------")
-    while True:
-        print("\nSelect operation:")
-        print("1. Add")
-        print("2. Subtract")
-        print("3. Multiply")
-        print("4. Divide")
-        print("q. Quit")
-        
-        choice = input("Enter choice: ").strip()
-        
-        if choice == 'q':
-            print("Goodbye!")
-            break
-        
-        if choice not in ['1','2','3','4']:
-            print("Invalid choice, try again.")
-            continue
-        
-        try:
-            num1 = float(input("Enter first number: "))
-            num2 = float(input("Enter second number: "))
-        except ValueError:
-            print("Please enter valid numbers.")
-            continue
+        for token in tokens:
+            if token in self.operators:
+                while (
+                    operators
+                    and operators[-1] in self.operators
+                    and self.precedence[operators[-1]] >= self.precedence[token]
+                ):
+                    self._apply_operator(operators, values)
+                operators.append(token)
+            else:
+                try:
+                    values.append(float(token))
+                except ValueError:
+                    raise ValueError(f"invalid token: {token}")
 
-        if choice == '1':
-            print("Result:", add(num1, num2))
-        elif choice == '2':
-            print("Result:", subtract(num1, num2))
-        elif choice == '3':
-            print("Result:", multiply(num1, num2))
-        elif choice == '4':
-            result = divide(num1, num2)
-            if result is not None:
-                print("Result:", result)
+        while operators:
+            self._apply_operator(operators, values)
 
-if __name__ == "__main__":
-    calculator()
+        if len(values) != 1:
+            raise ValueError("invalid expression")
+
+        return values[0]
+
+    def _apply_operator(self, operators, values):
+        if not operators:
+            return
+
+        operator = operators.pop()
+        if len(values) < 2:
+            raise ValueError(f"not enough operands for operator {operator}")
+
+        b = values.pop()
+        a = values.pop()
+        values.append(self.operators[operator](a, b))
