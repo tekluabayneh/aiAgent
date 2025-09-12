@@ -3,6 +3,7 @@ import sys
 from dotenv import load_dotenv 
 from google import genai 
 from google.genai import types 
+from functions.get_files_info import get_files_info
 load_dotenv()
 
 def main():
@@ -33,6 +34,6 @@ def main():
 
     print("aI RESPONSE", response.text)
 
+print(get_files_info("calculator", "pkg"))
 
-
-main()
+# main()
