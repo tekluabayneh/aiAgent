@@ -3,8 +3,8 @@ from functions.get_file_content import get_file_content
 from functions.write_file import write_file 
 from functions.run_python import run_python_file 
 
-def main(): 
-    working_dir = "calculator" 
+# def main(): 
+    # working_dir = "calculator" 
     # root_contents = get_files_info(working_dir) 
     # pkg_content = get_files_info(working_dir, "pkg")
     # pkg_content = get_files_info(working_dir, "/bin")
@@ -17,7 +17,7 @@ def main():
     # print(write_file(working_dir, "morelorem.txt", "this is the file man"))
 
 
-    print(run_python_file(working_dir, "main.py"))
+    # print(run_python_file(working_dir, "main.py", {"3 +  5"}))
 
 
-main()
+# main()

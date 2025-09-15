@@ -1,43 +1,61 @@
-
-import os 
+import os
 import subprocess
+from google.genai import types 
 
-def run_python_file(working_directory:str, file_path:str): 
+def run_python_file(working_directory: str, file_path: str, args =[]):
     abs_working_dir = os.path.abspath(working_directory)
-    abs_direcotry = os.path.abspath(os.path.join(working_directory,  file_path))
+    abs_directory = os.path.abspath(os.path.join(working_directory, file_path))
 
-    if not abs_direcotry.startswith(abs_working_dir): 
+    if not abs_directory.startswith(abs_working_dir):
         return f"Errors: {abs_working_dir} is not a directory"
 
+    if not os.path.isfile(abs_directory):
+        return f"Errors: {abs_directory} is not a file directory"
 
-    if not os.path.isfile(abs_direcotry): 
-        return f"Errors: {abs_direcotry} is not a file directory"
+    if not file_path.endswith(".py"):
+        return f"Errors: {abs_directory} is not a python file"
 
-    if not file_path.endswith(".py"): 
-        return f"Errors: {abs_direcotry} is not a python file"
+    try:
+        final_args = ["python", file_path]
+        final_args.extend(args)
 
+        output = subprocess.run(
+            final_args,
+            cwd=abs_working_dir,
+            timeout=30,
+            capture_output=True,
+            text=True
+        )
 
-
-    try: 
-        output = subprocess.run(["python", file_path], cmd=abs_working_dir, timeout=30)
+        if output.stdout == "" and output.stderr == "":
+            return "No output produced."
 
         final_string = f"""
-           STDOUT: {output.stdout}
-           STDIN: {output.stderr}
-           """
+        STDOUT: {output.stdout}
+        STDERR: {output.stderr}
+        """
 
-        if final_string.stdout == "" and output.stdrr == "": 
-            final_string = "No output produced."
+        if output.returncode != 0:
+            final_string += f"\nProcess exited with code {output.returncode}"
 
-        if final_string.returnCode != 0: 
-            final_string += f"process exited with code {output.returnCode}"
+        return final_string
+
     except Exception as e:
-        return f"cound not run python file"
+        return f"Could not run python file: {e}"
 
-
-
-
-
+schema_run_file_content = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
+            ),
+        },
+    ),
+)
 
 
 
