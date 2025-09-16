@@ -23,19 +23,25 @@ def write_file(working_directory, file_path, content):
         return f"could not write contnet to file path {abs_direcotry}, {e}"
 
 
-schema_write_file_content= types.FunctionDeclaration(
+schema_write_file_content = types.FunctionDeclaration(
     name="write_file",
-    description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
+    description="Writes content to a file within the specified working directory, creating parent directories if needed.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-            "directory": types.Schema(
+            "working_directory": types.Schema(
                 type=types.Type.STRING,
-                description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
+                description="The base directory where the file should be written."
+            ),
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The relative path to the file within the working directory."
+            ),
+            "content": types.Schema(
+                type=types.Type.STRING,
+                description="The content to write into the file."
             ),
         },
+        required=["working_directory", "file_path", "content"],
     ),
 )
-
-
-
